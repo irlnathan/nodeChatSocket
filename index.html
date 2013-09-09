@@ -1,0 +1,85 @@
+<!DOCTYPE html>
+<html>
+<head>
+	<title></title>
+<style type="text/css">
+	#incoming-chat-window {
+		height: 300px;
+		overflow: auto;
+	}
+</style>
+</head>
+<body>
+
+	<!-- Chat Form to All Sockets -->
+	<div id="incoming-chat-window"></div>
+	<form id="outgoing-chat-form">
+		<input size="50" type="text" id="outgoing-chat-field"></input>
+		<input type="submit"></input>
+	</form>
+	<!-- End -->
+
+	<!-- Chat Form to Beta Room -->
+	To beta Room
+	<div id="incoming-chat-window2"></div>
+	<form id="outgoing-chat-form2">
+		<input size="50" type="text" id="outgoing-chat-field2"></input>
+		<input type="submit"></input>
+	</form>
+	<!-- End -->
+
+	<!-- Join 'beta' room -->
+	<button id="room">Join Room</button>
+	<!-- End -->
+
+	<script src="/socket.io/socket.io.js"></script>
+	<script src="http://ajax.googleapis.com/ajax/libs/jquery/1.10.2/jquery.min.js"></script>
+	
+	<script>
+
+	$(document).ready(function(){
+
+		// Default Room
+		$('#outgoing-chat-form').submit(function(e){
+			e.preventDefault();
+			socket.emit('send message', $('#outgoing-chat-field').val());
+			$('#outgoing-chat-field').val('');
+		});
+
+		// Beta Room
+		$('#outgoing-chat-form2').submit(function(e){
+			e.preventDefault();
+			socket.emit('send message2', $('#outgoing-chat-field2').val());
+			$('#outgoing-chat-field2').val('');
+		});	
+
+
+		// Initially Connect to the socket server
+  	var socket = io.connect('http://localhost');
+
+  	// Listen for an event called News and put its contents
+  	// in '#incoming-chat-window'
+  	socket.on('news', function (data) {
+    	$('#incoming-chat-window').append(data + '<br/>');
+  	});
+
+  	// Listen for an event called 'new message' and put its 
+  	// contents in '#incoming-chat-window'
+  	socket.on('new message', function(data){
+				$('#incoming-chat-window').append(data + '<br/>');
+		});
+
+
+		$('#room').click(function(e){
+				e.preventDefault();
+				var data = {
+				  room: 'beta'	
+				}
+				socket.emit('subscribe', data);
+			});
+
+  });
+
+	</script>
+</body>
+</html>
